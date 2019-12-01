@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">CalendarWidget</string>
+    <string name="empty_view_text">Empty text</string>
+</resources>
