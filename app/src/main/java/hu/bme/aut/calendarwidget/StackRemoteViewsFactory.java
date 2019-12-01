@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RemoteViews;
@@ -15,7 +16,7 @@ import java.util.List;
 
 
 class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
-    private static final int mCount = 3;
+    private static final int mCount = 8;
     private List<WidgetItem> mWidgetItems = new ArrayList<WidgetItem>();
     private Context mContext;
     private int mAppWidgetId;
@@ -46,14 +47,26 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         mWidgetItems.clear();
     }
     public int getCount() {
-        return mCount;
+        return mCount * 2;
     }
-    public RemoteViews getViewAt(int position) {
-        // position will always range from 0 to getCount() - 1.
-        // We construct a remote views item based on our widget item xml file, and set the
-        // text based on the position.
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item).apply();
-        rv.setTextViewText(R.id.widget_item, mWidgetItems.get(position).text);
+
+    private RemoteViews createPadding(int paddingSize) {
+        int layout = R.layout.widget_empty_item;
+        int item = R.id.widget_empty_item;
+
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), layout);
+        // rv.setTextViewText(item, "padding");
+        rv.setTextViewTextSize(item, TypedValue.COMPLEX_UNIT_DIP, paddingSize);
+        return rv;
+    }
+
+    private RemoteViews createItem(String text, int size, int position) {
+        int item = R.id.widget_item_text;
+        int spacingItem = R.id.widget_item_spacing;
+
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
+        rv.setTextViewText(item, text);
+        rv.setTextViewTextSize(spacingItem, TypedValue.COMPLEX_UNIT_DIP, 10 * (position+1));
 
         // Next, we set a fill-intent which will be used to fill-in the pending intent template
         // which is set on the collection view in StackWidgetProvider.
@@ -63,6 +76,19 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         fillInIntent.putExtras(extras);
 
         rv.setOnClickFillInIntent(R.id.widget_item, fillInIntent);
+        return rv;
+    }
+    public RemoteViews getViewAt(int position) {
+        // position will always range from 0 to getCount() - 1.
+        // We construct a remote views item based on our widget item xml file, and set the
+        // text based on the position.
+        RemoteViews rv;
+
+        if (position % 2 == 0)
+            rv = createItem(mWidgetItems.get(position / 2).text, position * 10, position);
+        else
+            rv = createPadding((position + 1) * 10);
+
 //        rv.setViewPadding(R.id.widget_item, 0, position * 50, 0, 0);
 //        rv.setInt(R.id.widget_item, "setMinimumHeight", 1000);
         // You can do heaving lifting in here, synchronously. For example, if you need to
@@ -84,7 +110,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         return null;
     }
     public int getViewTypeCount() {
-        return 1;
+        return 2;
     }
     public long getItemId(int position) {
         return position;
@@ -99,5 +125,24 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         // from the network, etc., it is ok to do it here, synchronously. The widget will remain
         // in its current state while work is being done here, so you don't need to worry about
         // locking up the widget.
+    }
+
+    private String createTextForEvent(String text, int heightInUnits) {
+        if (heightInUnits <= 1) {
+            return text;
+        }
+
+        String endingSpace = "";
+        if (heightInUnits % 2 == 0) {
+            endingSpace += "\n";
+            heightInUnits -= 1;
+        }
+
+        String paddingLines = "";
+        for (int i = 1; i <= heightInUnits / 2; ++i) {
+            paddingLines += "\n";
+        }
+
+        return paddingLines + text + paddingLines + endingSpace;
     }
 }
