@@ -1,37 +1,56 @@
 package hu.bme.aut.calendarwidget;
 
+import android.accounts.Account;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-import android.widget.TextView;
+
+import androidx.core.app.ActivityCompat;
+
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.calendar.CalendarScopes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import static androidx.core.app.ActivityCompat.startActivityForResult;
 
 
 class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
-    private static final int mCount = 8;
+    private static int mCount;
+
     private List<WidgetItem> mWidgetItems = new ArrayList<WidgetItem>();
     private Context mContext;
     private int mAppWidgetId;
-    public StackRemoteViewsFactory(Context context, Intent intent) {
+
+    private CalendarDownloader downloader;
+
+    public StackRemoteViewsFactory(Context context, Intent intent, CalendarDownloader calendarDownloader) {
         mContext = context;
-        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID);
+        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+        this.downloader = calendarDownloader;
     }
     public void onCreate() {
         // In onCreate() you setup any connections / cursors to your data source. Heavy lifting,
         // for example downloading or creating content etc, should be deferred to onDataSetChanged()
         // or getViewAt(). Taking more than 20 seconds in this call will result in an ANR.
+
+        mCount = 4;
         for (int i = 0; i < mCount; i++) {
             mWidgetItems.add(new WidgetItem(i + "!"));
         }
+
+        downloader.onCreate();
+
         // We sleep for 3 seconds here to show how the empty view appears in the interim.
         // The empty view is set in the StackWidgetProvider and should be a sibling of the
         // collection view.
@@ -79,9 +98,11 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         return rv;
     }
     public RemoteViews getViewAt(int position) {
-        // position will always range from 0 to getCount() - 1.
-        // We construct a remote views item based on our widget item xml file, and set the
-        // text based on the position.
+
+        downloader.onUpdate();
+
+        System.out.println("onUpdate "+downloader.getModel().size());
+
         RemoteViews rv;
 
         if (position % 2 == 0)
