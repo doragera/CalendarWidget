@@ -4,6 +4,7 @@ import android.accounts.Account;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -11,6 +12,7 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import androidx.core.app.ActivityCompat;
+import androidx.preference.PreferenceManager;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -73,23 +75,23 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         return mCount * 2;
     }
 
-    private RemoteViews createPadding(int paddingSize) {
+    private RemoteViews createPadding(int paddingSize, int scale) {
         int layout = R.layout.widget_empty_item;
         int item = R.id.widget_empty_item;
 
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), layout);
         // rv.setTextViewText(item, "padding");
-        rv.setTextViewTextSize(item, TypedValue.COMPLEX_UNIT_DIP, paddingSize);
+        rv.setTextViewTextSize(item, TypedValue.COMPLEX_UNIT_DIP, paddingSize*scale);
         return rv;
     }
 
-    private RemoteViews createItem(String text, int size, int position) {
+    private RemoteViews createItem(String text, int size, int position, int scale) {
         int item = R.id.widget_item_text;
         int spacingItem = R.id.widget_item_spacing;
 
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
         rv.setTextViewText(item, text);
-        rv.setTextViewTextSize(spacingItem, TypedValue.COMPLEX_UNIT_DIP, 10 * (position+1));
+        rv.setTextViewTextSize(spacingItem, TypedValue.COMPLEX_UNIT_DIP, scale * size);
 
         // Next, we set a fill-intent which will be used to fill-in the pending intent template
         // which is set on the collection view in StackWidgetProvider.
@@ -107,12 +109,15 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 //        System.out.println("onUpdate "+downloader.getModel().size());
 
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+        int scale = pref.getInt("event_scale", 100);
+
         RemoteViews rv;
 
         if (position % 2 == 0)
-            rv = createItem(mWidgetItems.get(position / 2).text, position * 10, position);
+            rv = createItem(mWidgetItems.get(position / 2).text, 1, position, scale);
         else
-            rv = createPadding((position + 1) * 10);
+            rv = createPadding(1, scale);
 
 //        rv.setViewPadding(R.id.widget_item, 0, position * 50, 0, 0);
 //        rv.setInt(R.id.widget_item, "setMinimumHeight", 1000);
