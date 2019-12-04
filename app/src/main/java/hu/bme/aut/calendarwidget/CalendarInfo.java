@@ -6,16 +6,16 @@ import com.google.api.services.calendar.model.CalendarListEntry;
 
 class CalendarInfo {
 
-    private String name;
-    private String displayName;
-    private Boolean visible;
-    private Boolean syncevents;
+    final String id;
+    final String displayName;
+    final Boolean visible;
+    final boolean syncEvents;
 
-    public CalendarInfo(String name, String displayName, Boolean visible, Boolean syncevents) {
-        this.name = name;
+    public CalendarInfo(String id, String displayName, boolean visible, boolean syncEvents) {
+        this.id = id;
         this.displayName = displayName;
         this.visible = visible;
-        this.syncevents = syncevents;
+        this.syncEvents = syncEvents;
     }
 
 //    CalendarInfo(Calendar calendar) {

@@ -1,22 +1,28 @@
 package hu.bme.aut.calendarwidget;
 
-import com.google.api.services.calendar.model.Calendar;
-import com.google.api.services.calendar.model.CalendarListEntry;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 class CalendarModel {
 
-    private final ArrayList<CalendarInfo> calendars = new ArrayList<CalendarInfo>();
+    private final ArrayListMultimap<String, CalendarInfo> calendars = ArrayListMultimap.create();
 
     int size() {
         synchronized (calendars) {
             return calendars.size();
         }
+    }
+
+    Set<String> getAccounts() {
+        return calendars.keySet();
+    }
+
+    List<CalendarInfo> getCalendars(String accName) {
+        return calendars.get(accName);
     }
 
 //    void remove(String id) {
@@ -31,9 +37,9 @@ class CalendarModel {
 //        }
 //    }
 //
-    void add(CalendarInfo calendarToAdd) {
+    void add(String accName, CalendarInfo calendarToAdd) {
         synchronized (calendars) {
-            calendars.add(calendarToAdd);
+            calendars.put(accName, calendarToAdd);
         }
     }
 //

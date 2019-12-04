@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".StackWidgetProvider">
+        <receiver android:name=".CalendarWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -34,7 +34,7 @@
         </receiver>
 
         <service
-            android:name=".StackWidgetService"
+            android:name=".CalendarService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>

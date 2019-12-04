@@ -23,7 +23,7 @@ import android.net.Uri;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-public class StackWidgetProvider extends AppWidgetProvider {
+public class CalendarWidgetProvider extends AppWidgetProvider {
     public static final String TOAST_ACTION = "com.example.android.stackwidget.TOAST_ACTION";
     public static final String EXTRA_ITEM = "com.example.android.stackwidget.EXTRA_ITEM";
     @Override
@@ -56,7 +56,7 @@ public class StackWidgetProvider extends AppWidgetProvider {
             System.out.println("onUpdate");
             // Here we setup the intent which points to the StackViewService which will
             // provide the views for this collection.
-            Intent intent = new Intent(context, StackWidgetService.class);
+            Intent intent = new Intent(context, CalendarService.class);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
             // When intents are compared, the extras are ignored, so we need to embed the extras
             // into the data so that the extras will not be ignored.
@@ -71,8 +71,8 @@ public class StackWidgetProvider extends AppWidgetProvider {
             // cannot setup their own pending intents, instead, the collection as a whole can
             // setup a pending intent template, and the individual items can set a fillInIntent
             // to create unique before on an item to item basis.
-            Intent toastIntent = new Intent(context, StackWidgetProvider.class);
-            toastIntent.setAction(StackWidgetProvider.TOAST_ACTION);
+            Intent toastIntent = new Intent(context, CalendarWidgetProvider.class);
+            toastIntent.setAction(CalendarWidgetProvider.TOAST_ACTION);
             toastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
             PendingIntent toastPendingIntent = PendingIntent.getBroadcast(context, 0, toastIntent,

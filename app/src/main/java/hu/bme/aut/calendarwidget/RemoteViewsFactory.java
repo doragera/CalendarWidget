@@ -1,6 +1,5 @@
 package hu.bme.aut.calendarwidget;
 
-import android.accounts.Account;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
@@ -11,26 +10,19 @@ import android.util.TypedValue;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import androidx.core.app.ActivityCompat;
 import androidx.preference.PreferenceManager;
 
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.Calendar;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static androidx.core.app.ActivityCompat.startActivityForResult;
 
-
-class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
+class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private static int mCount;
 
+    private CalendarModel model = null;
     private List<WidgetItem> mWidgetItems = new ArrayList<WidgetItem>();
     private Context mContext;
     private int mAppWidgetId;
@@ -40,7 +32,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     private CalendarDownloader downloader;
 
-    public StackRemoteViewsFactory(Context context, Intent intent, CalendarDownloader calendarDownloader) {
+    public RemoteViewsFactory(Context context, Intent intent, CalendarDownloader calendarDownloader) {
         mContext = context;
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         this.downloader = calendarDownloader;
@@ -56,9 +48,11 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         }
 
         downloader.onCreate();
+        model = downloader.getDataFromCalendarTable();
+//        onDataSetChanged();
 
         // We sleep for 3 seconds here to show how the empty view appears in the interim.
-        // The empty view is set in the StackWidgetProvider and should be a sibling of the
+        // The empty view is set in the CalendarWidgetProvider and should be a sibling of the
         // collection view.
         /*try {
             // Thread.sleep(3000);
@@ -94,9 +88,9 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         rv.setTextViewTextSize(spacingItem, TypedValue.COMPLEX_UNIT_DIP, scale * size);
 
         // Next, we set a fill-intent which will be used to fill-in the pending intent template
-        // which is set on the collection view in StackWidgetProvider.
+        // which is set on the collection view in CalendarWidgetProvider.
         Bundle extras = new Bundle();
-        extras.putInt(StackWidgetProvider.EXTRA_ITEM, position);
+        extras.putInt(CalendarWidgetProvider.EXTRA_ITEM, position);
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
 
@@ -156,6 +150,10 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         // in its current state while work is being done here, so you don't need to worry about
         // locking up the widget.
 
+        Log.d("onDatasetChanged", "onDatasetChanged");
+
+
+        downloader.getAllEvents(model);
         // call the downloader with the date range, returns List<EventInfo>
     }
 

@@ -18,16 +18,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Preference
-        app:fragment="hu.bme.aut.calendarwidget.SettingsActivity$MessagesFragment"
-        app:icon="@drawable/messages"
-        app:key="messages_header"
-        app:title="@string/messages_header" />
-
-    <Preference
         app:fragment="hu.bme.aut.calendarwidget.SettingsActivity$SyncFragment"
         app:icon="@drawable/sync"
-        app:key="sync_header"
-        app:title="@string/sync_header" />
+        app:key="display_header"
+        app:title="@string/display_header" />
 
     <SeekBarPreference
         android:dialogLayout="@layout/dialog_seekbar"
