@@ -20,6 +20,7 @@ import com.google.api.services.calendar.CalendarScopes;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static androidx.core.app.ActivityCompat.startActivityForResult;
@@ -31,6 +32,9 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private List<WidgetItem> mWidgetItems = new ArrayList<WidgetItem>();
     private Context mContext;
     private int mAppWidgetId;
+
+    private Date startDate;
+    private Date endDate;
 
     private CalendarDownloader downloader;
 
@@ -101,7 +105,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
         downloader.onUpdate();
 
-        System.out.println("onUpdate "+downloader.getModel().size());
+//        System.out.println("onUpdate "+downloader.getModel().size());
 
         RemoteViews rv;
 
@@ -146,6 +150,8 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         // from the network, etc., it is ok to do it here, synchronously. The widget will remain
         // in its current state while work is being done here, so you don't need to worry about
         // locking up the widget.
+
+        // call the downloader with the date range, returns List<EventInfo>
     }
 
     private String createTextForEvent(String text, int heightInUnits) {

@@ -9,11 +9,11 @@ import java.io.IOException;
 
 public class AsyncLoadEvents extends AsyncTask<Void, Void, Boolean> {
     private final CalendarModel model;
-    private final Calendar client;
+//    private final Calendar client;
 
     public AsyncLoadEvents(CalendarModel model, Calendar client) {
         this.model = model;
-        this.client = client;
+//        this.client = client;
     }
 
     static void run(CalendarModel model, Calendar client) {
@@ -22,14 +22,14 @@ public class AsyncLoadEvents extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-        CalendarList feed = null;
-        try {
-            feed = client.calendarList().list().setFields(CalendarInfo.FEED_FIELDS).execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        model.reset(feed.getItems());
+//        CalendarList feed = null;
+//        try {
+//            feed = client.calendarList().list().setFields(CalendarInfo.FEED_FIELDS).execute();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//        model.reset(feed.getItems());
         return true;
     }
 }

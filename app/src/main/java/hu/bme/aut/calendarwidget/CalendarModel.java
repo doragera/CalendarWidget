@@ -11,7 +11,7 @@ import java.util.Map;
 
 class CalendarModel {
 
-    private final Map<String, CalendarInfo> calendars = new HashMap<String, CalendarInfo>();
+    private final ArrayList<CalendarInfo> calendars = new ArrayList<CalendarInfo>();
 
     int size() {
         synchronized (calendars) {
@@ -19,57 +19,52 @@ class CalendarModel {
         }
     }
 
-    void remove(String id) {
+//    void remove(String id) {
+//        synchronized (calendars) {
+//            calendars.remove(id);
+//        }
+//    }
+//
+//    CalendarInfo get(String id) {
+//        synchronized (calendars) {
+//            return calendars.get(id);
+//        }
+//    }
+//
+    void add(CalendarInfo calendarToAdd) {
         synchronized (calendars) {
-            calendars.remove(id);
+            calendars.add(calendarToAdd);
         }
     }
-
-    CalendarInfo get(String id) {
-        synchronized (calendars) {
-            return calendars.get(id);
-        }
-    }
-
-    void add(Calendar calendarToAdd) {
-        synchronized (calendars) {
-            CalendarInfo found = get(calendarToAdd.getId());
-            if (found == null) {
-                calendars.put(calendarToAdd.getId(), new CalendarInfo(calendarToAdd));
-            } else {
-                found.update(calendarToAdd);
-            }
-        }
-    }
-
-    void add(CalendarListEntry calendarToAdd) {
-        synchronized (calendars) {
-            CalendarInfo found = get(calendarToAdd.getId());
-            if (found == null) {
-                calendars.put(calendarToAdd.getId(), new CalendarInfo(calendarToAdd));
-            } else {
-                found.update(calendarToAdd);
-            }
-        }
-    }
-
-    void reset(List<CalendarListEntry> calendarsToAdd) {
-        synchronized (calendars) {
-            calendars.clear();
-            for (CalendarListEntry calendarToAdd : calendarsToAdd) {
-                add(calendarToAdd);
-            }
-        }
-    }
-
-    public CalendarInfo[] toSortedArray() {
-        synchronized (calendars) {
-            List<CalendarInfo> result = new ArrayList<CalendarInfo>();
-            for (CalendarInfo calendar : calendars.values()) {
-                result.add(calendar.clone());
-            }
-            Collections.sort(result);
-            return result.toArray(new CalendarInfo[0]);
-        }
-    }
+//
+//    void add(CalendarListEntry calendarToAdd) {
+//        synchronized (calendars) {
+//            CalendarInfo found = get(calendarToAdd.getId());
+//            if (found == null) {
+//                calendars.put(calendarToAdd.getId(), new CalendarInfo(calendarToAdd));
+//            } else {
+//                found.update(calendarToAdd);
+//            }
+//        }
+//    }
+//
+//    void reset(List<CalendarListEntry> calendarsToAdd) {
+//        synchronized (calendars) {
+//            calendars.clear();
+//            for (CalendarListEntry calendarToAdd : calendarsToAdd) {
+//                add(calendarToAdd);
+//            }
+//        }
+//    }
+//
+//    public CalendarInfo[] toSortedArray() {
+//        synchronized (calendars) {
+//            List<CalendarInfo> result = new ArrayList<CalendarInfo>();
+//            for (CalendarInfo calendar : calendars.values()) {
+//                result.add(calendar.clone());
+//            }
+//            Collections.sort(result);
+//            return result.toArray(new CalendarInfo[0]);
+//        }
+//    }
 }
