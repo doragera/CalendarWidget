@@ -1,14 +1,14 @@
 package hu.bme.aut.calendarwidget;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.IBinder;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.CheckBoxPreference;
@@ -17,14 +17,16 @@ import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static androidx.appcompat.app.AlertDialog.*;
 
 public class SettingsActivity extends AppCompatActivity implements
         PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     private static final String TITLE_TAG = "settingsActivityTitle";
+    private static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 100;
 
 //    static boolean mBounded;
 //    static CalendarDayService mServer;
@@ -97,7 +99,48 @@ public class SettingsActivity extends AppCompatActivity implements
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CALENDAR)) {
+//                showRationaleDialog();
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_CALENDAR},
+                        MY_PERMISSIONS_REQUEST_READ_CALENDAR);
+            }
+        } else {
+            // Permission has already been granted
+        }
     }
+
+//    private void showRationaleDialog() {
+//        String title = getResources().getString(R.string.rationale_dialog_title);
+//        String explanation = getResources().getString(R.string.calendars_permission_explanation);
+//         AlertDialog alertDialog = new AlertDialog.Builder(this)
+//                .setTitle(title)
+//                .setMessage(explanation)
+//                 .setPositiveButton("OK", null)
+//                 .setNegativeButton("Cancel", null)
+//                 .create()
+//                 .show();
+//    }
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+//        switch (requestCode) {
+//            case MY_PERMISSIONS_REQUEST_READ_CALENDAR: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//
+//                } else {
+//                }
+//                return;
+//            }
+//        }
+//    }
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -130,6 +173,8 @@ public class SettingsActivity extends AppCompatActivity implements
                 .commit();
         setTitle(pref.getTitle());
         return true;
+
+
     }
 
     public static class HeaderFragment extends PreferenceFragmentCompat {

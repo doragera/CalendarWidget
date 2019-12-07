@@ -21,4 +21,8 @@
     <string name="pref_event_scale_desc">It scales the events height per hour</string>
     <string name="pref_text_scale">Text size</string>
     <string name="pref_text_scale_desc">It scales the texts</string>
+    <string name="rationale_dialog_title">Attention!</string>
+    <string name="proceed">Proceed</string>
+    <string name="exit">Exit</string>
+    <string name="calendars_permission_explanation">The application needs to access your calendars to display them.</string>
 </resources>

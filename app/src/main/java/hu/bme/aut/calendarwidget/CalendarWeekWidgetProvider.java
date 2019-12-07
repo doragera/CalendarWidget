@@ -73,31 +73,36 @@ public class CalendarWeekWidgetProvider extends AppWidgetProvider {
         for (int i = 0; i < appWidgetIds.length; ++i) {
             // Here we setup the intent which points to the StackViewService which will
             // provide the views for this collection.
-            Intent intent = new Intent(context, CalendarWeekService.class);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
-            // When intents are compared, the extras are ignored, so we need to embed the extras
-            // into the data so that the extras will not be ignored.
-            intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_layout_week);
-            rv.setOnClickPendingIntent(R.id.settings, PendingIntent.getBroadcast(context, 0, new Intent(context, getClass()).setAction(SETTINGS_CLICK), 0));
-            rv.setOnClickPendingIntent(R.id.refresh, PendingIntent.getBroadcast(context, 0, new Intent(context, getClass()).setAction(REFRESH_CLICK).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]), 0));
 
-            rv.setRemoteAdapter(appWidgetIds[i], R.id.itemsview1, intent);
-            // The empty view is displayed when the collection has no items. It should be a sibling
-            // of the collection view.
-            rv.setEmptyView(R.id.itemsview1, R.id.empty_view);
-            // Here we setup the a pending intent template. Individuals items of a collection
-            // cannot setup their own pending intents, instead, the collection as a whole can
-            // setup a pending intent template, and the individual items can set a fillInIntent
-            // to create unique before on an item to item basis.
-            Intent viewIntent = new Intent(context, CalendarWeekWidgetProvider.class);
-            viewIntent.setAction(CalendarWeekWidgetProvider.VIEW_ACTION);
-            viewIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
-            intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-            PendingIntent viewPendingIntent = PendingIntent.getBroadcast(context, 0, viewIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            rv.setPendingIntentTemplate(R.id.itemsview1, viewPendingIntent);
-            appWidgetManager.updateAppWidget(appWidgetIds, rv);
+            for (int day = 1; day <= 7; ++day) {
+                int resId = context.getResources().getIdentifier("itemsview" + day, "id", context.getPackageName());
+                Intent intent = new Intent(context, CalendarWeekService.class);
+                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
+                // When intents are compared, the extras are ignored, so we need to embed the extras
+                // into the data so that the extras will not be ignored.
+                intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
+                RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_layout_week);
+                rv.setOnClickPendingIntent(R.id.settings, PendingIntent.getBroadcast(context, 0, new Intent(context, getClass()).setAction(SETTINGS_CLICK), 0));
+                rv.setOnClickPendingIntent(R.id.refresh, PendingIntent.getBroadcast(context, 0, new Intent(context, getClass()).setAction(REFRESH_CLICK).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]), 0));
+
+                rv.setRemoteAdapter(appWidgetIds[i], resId, intent);
+                // The empty view is displayed when the collection has no items. It should be a sibling
+                // of the collection view.
+                rv.setEmptyView(R.id.itemsview1, R.id.empty_view);
+                // Here we setup the a pending intent template. Individuals items of a collection
+                // cannot setup their own pending intents, instead, the collection as a whole can
+                // setup a pending intent template, and the individual items can set a fillInIntent
+                // to create unique before on an item to item basis.
+                Intent viewIntent = new Intent(context, CalendarWeekWidgetProvider.class);
+                viewIntent.setAction(CalendarWeekWidgetProvider.VIEW_ACTION);
+                viewIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
+                viewIntent.setData(Uri.parse(viewIntent.toUri(Intent.URI_INTENT_SCHEME)));
+                PendingIntent viewPendingIntent = PendingIntent.getBroadcast(context, 0, viewIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+                rv.setPendingIntentTemplate(resId, viewPendingIntent);
+                appWidgetManager.updateAppWidget(appWidgetIds, rv);
+            }
+
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
