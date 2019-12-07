@@ -17,15 +17,20 @@ package hu.bme.aut.calendarwidget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.CalendarContract;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 public class CalendarWidgetProvider extends AppWidgetProvider {
-    public static final String TOAST_ACTION = "com.example.android.stackwidget.TOAST_ACTION";
-    public static final String EXTRA_ITEM = "com.example.android.stackwidget.EXTRA_ITEM";
+    public static final String VIEW_ACTION = "hu.bme.aut.calendarwidget.VIEW_ACTION";
+    public static final String EXTRA_ITEM = "hu.bme.aut.calendarwidget.EXTRA_ITEM";
+    private static final String SETTINGS_CLICK = "hu.bme.aut.calendarwidget.SETTINGS_CLICK";
+    private static final String REFRESH_CLICK = "hu.bme.aut.calendarwidget.REFRESH_CLICK";
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
         super.onDeleted(context, appWidgetIds);
@@ -41,11 +46,26 @@ public class CalendarWidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-        if (intent.getAction().equals(TOAST_ACTION)) {
-            int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-                    AppWidgetManager.INVALID_APPWIDGET_ID);
+        if (intent.getAction().equals(VIEW_ACTION)) {
+            int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);
-            Toast.makeText(context, "Touched view " + viewIndex, Toast.LENGTH_SHORT).show();
+
+            Uri uri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, viewIndex);
+            Intent viewIntent = new Intent(Intent.ACTION_VIEW)
+                    .setData(uri);
+            viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(viewIntent);
+//            Toast.makeText(context, "Touched view " + viewIndex, Toast.LENGTH_SHORT).show();
+        }
+        if (intent.getAction().equals(SETTINGS_CLICK)) {
+            Intent startintent = new Intent(context, SettingsActivity.class);
+            startintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(startintent);
+        }
+        if (intent.getAction().equals(REFRESH_CLICK)) {
+            System.out.println("refresh");
+            int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+            AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetId, R.layout.widget_layout);
         }
         super.onReceive(context, intent);
     }
@@ -53,7 +73,7 @@ public class CalendarWidgetProvider extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // update each of the widgets with the remote adapter
         for (int i = 0; i < appWidgetIds.length; ++i) {
-            System.out.println("onUpdate");
+            Log.d("onUpdate", ""+i);
             // Here we setup the intent which points to the StackViewService which will
             // provide the views for this collection.
             Intent intent = new Intent(context, CalendarService.class);
@@ -62,6 +82,8 @@ public class CalendarWidgetProvider extends AppWidgetProvider {
             // into the data so that the extras will not be ignored.
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
             RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+            rv.setOnClickPendingIntent(R.id.settings, PendingIntent.getBroadcast(context, 0, new Intent(context, getClass()).setAction(SETTINGS_CLICK), 0));
+            rv.setOnClickPendingIntent(R.id.refresh, PendingIntent.getBroadcast(context, 0, new Intent(context, getClass()).setAction(REFRESH_CLICK).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]), 0));
 
             rv.setRemoteAdapter(appWidgetIds[i], R.id.itemsview, intent);
             // The empty view is displayed when the collection has no items. It should be a sibling
@@ -71,13 +93,13 @@ public class CalendarWidgetProvider extends AppWidgetProvider {
             // cannot setup their own pending intents, instead, the collection as a whole can
             // setup a pending intent template, and the individual items can set a fillInIntent
             // to create unique before on an item to item basis.
-            Intent toastIntent = new Intent(context, CalendarWidgetProvider.class);
-            toastIntent.setAction(CalendarWidgetProvider.TOAST_ACTION);
-            toastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
+            Intent viewIntent = new Intent(context, CalendarWidgetProvider.class);
+            viewIntent.setAction(CalendarWidgetProvider.VIEW_ACTION);
+            viewIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-            PendingIntent toastPendingIntent = PendingIntent.getBroadcast(context, 0, toastIntent,
+            PendingIntent viewPendingIntent = PendingIntent.getBroadcast(context, 0, viewIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            rv.setPendingIntentTemplate(R.id.itemsview, toastPendingIntent);
+            rv.setPendingIntentTemplate(R.id.itemsview, viewPendingIntent);
             appWidgetManager.updateAppWidget(appWidgetIds, rv);
         }
         super.onUpdate(context, appWidgetManager, appWidgetIds);

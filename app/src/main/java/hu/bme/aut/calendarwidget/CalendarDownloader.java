@@ -139,7 +139,7 @@ public class CalendarDownloader {
 //            System.out.println(String.format("0x%08X", i));
 
             if (visibleCalendarIDs.contains(calendarID) && Integer.parseInt(allDay)==0) {
-                events.add(new EventInfo(eventId, title, Long.parseLong(begin), Long.parseLong(end), color));
+                events.add(new EventInfo(Integer.parseInt(eventId), title, Long.parseLong(begin), Long.parseLong(end), Integer.parseInt(color)));
             }
 
         }
@@ -171,7 +171,7 @@ public class CalendarDownloader {
             events.add(disp.get(i));
             if (i < disp.size()-1) {
 //                float padding = (float)(disp.get(i+1).begin-events.get(i).end)/(1000*60*60);
-                events.add(new EventInfo(null, "padding", disp.get(i).end, disp.get(i+1).begin, null));
+                events.add(new EventInfo(0, "padding", disp.get(i).end, disp.get(i+1).begin, 0));
             }
         }
 

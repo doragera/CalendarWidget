@@ -33,5 +33,15 @@
         android:title="@string/pref_event_scale"
         android:summary="@string/pref_event_scale_desc"/>
 
+    <SeekBarPreference
+        android:dialogLayout="@layout/dialog_seekbar"
+        android:defaultValue="30"
+        android:max="30"
+        android:min="10"
+        android:text=""
+        android:key="text_scale"
+        android:title="@string/pref_text_scale"
+        android:summary="@string/pref_text_scale_desc"/>
+
 
 </PreferenceScreen>

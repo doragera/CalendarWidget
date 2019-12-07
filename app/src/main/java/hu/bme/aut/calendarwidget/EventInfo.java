@@ -1,15 +1,17 @@
 package hu.bme.aut.calendarwidget;
 
+import static java.lang.Math.min;
+
 class EventInfo implements Comparable {
-     String eventID;
+     int eventID;
      String title;
      Long begin;
      Long end;
-     String color;
+     int color;
 
-    public EventInfo(String eventID, String title, Long begin, Long end, String color) {
+    public EventInfo(int eventID, String title, Long begin, Long end, int color) {
         this.eventID = eventID;
-        this.title = title;
+        this.title = title.substring(0, min(title.length(), 30));
         this.begin = begin;
         this.end = end;
         this.color = color;

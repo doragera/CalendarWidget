@@ -19,4 +19,6 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="pref_event_scale">Event height</string>
     <string name="pref_event_scale_desc">It scales the events height per hour</string>
+    <string name="pref_text_scale">Text size</string>
+    <string name="pref_text_scale_desc">It scales the texts</string>
 </resources>

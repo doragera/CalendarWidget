@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -84,18 +85,20 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         return rv;
     }
 
-    private RemoteViews createItem(String text, float size, int position, int scale) {
+    private RemoteViews createItem(String text, float size, int position, int scale, int textSize, int color, int eventID) {
         int item = R.id.widget_item_text;
         int spacingItem = R.id.widget_item_spacing;
 
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
         rv.setTextViewText(item, text);
+        rv.setTextViewTextSize(item, TypedValue.COMPLEX_UNIT_DIP, textSize);
         rv.setTextViewTextSize(spacingItem, TypedValue.COMPLEX_UNIT_DIP, scale * size);
+        rv.setInt(item, "setBackgroundColor", color);
 
         // Next, we set a fill-intent which will be used to fill-in the pending intent template
         // which is set on the collection view in CalendarWidgetProvider.
         Bundle extras = new Bundle();
-        extras.putInt(CalendarWidgetProvider.EXTRA_ITEM, position);
+        extras.putInt(CalendarWidgetProvider.EXTRA_ITEM, eventID);
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
 
@@ -111,6 +114,7 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
         int scale = pref.getInt("event_scale", 100);
+        int textSize = pref.getInt("text_scale", 20);
 
         RemoteViews rv = null;
 
@@ -127,7 +131,7 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             rv = createPadding(hour, scale);
         }
         else
-            rv = createItem(event.title, hour, position, scale);
+            rv = createItem(event.title, hour, position, scale, textSize, event.color, event.eventID);
 
         return rv;
     }
