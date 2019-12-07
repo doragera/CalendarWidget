@@ -15,6 +15,7 @@ import androidx.preference.PreferenceManager;
 import com.google.api.services.calendar.model.Calendar;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -23,9 +24,11 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private static int mCount;
 
     private CalendarModel model = null;
-    private List<WidgetItem> mWidgetItems = new ArrayList<WidgetItem>();
+//    private List<WidgetItem> mWidgetItems = new ArrayList<WidgetItem>();
     private Context mContext;
     private int mAppWidgetId;
+    private List<EventInfo> events;
+    int displayedithPrev = -1;
 
     private Date startDate;
     private Date endDate;
@@ -43,12 +46,14 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         // or getViewAt(). Taking more than 20 seconds in this call will result in an ANR.
 
         mCount = 4;
-        for (int i = 0; i < mCount; i++) {
-            mWidgetItems.add(new WidgetItem(i + "!"));
-        }
+//        for (int i = 0; i < mCount; i++) {
+//            mWidgetItems.add(new WidgetItem(i + "!"));
+//        }
+
 
         downloader.onCreate();
         model = downloader.getDataFromCalendarTable();
+        events = downloader.getAllEvents(model);
 //        onDataSetChanged();
 
         // We sleep for 3 seconds here to show how the empty view appears in the interim.
@@ -63,13 +68,13 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     public void onDestroy() {
         // In onDestroy() you should tear down anything that was setup for your data source,
         // eg. cursors, connections, etc.
-        mWidgetItems.clear();
+        events.clear();
     }
     public int getCount() {
-        return mCount * 2;
+        return events.size();
     }
 
-    private RemoteViews createPadding(int paddingSize, int scale) {
+    private RemoteViews createPadding(float paddingSize, int scale) {
         int layout = R.layout.widget_empty_item;
         int item = R.id.widget_empty_item;
 
@@ -79,7 +84,7 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         return rv;
     }
 
-    private RemoteViews createItem(String text, int size, int position, int scale) {
+    private RemoteViews createItem(String text, float size, int position, int scale) {
         int item = R.id.widget_item_text;
         int spacingItem = R.id.widget_item_spacing;
 
@@ -97,6 +102,7 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         rv.setOnClickFillInIntent(R.id.widget_item, fillInIntent);
         return rv;
     }
+
     public RemoteViews getViewAt(int position) {
 
         downloader.onUpdate();
@@ -106,26 +112,23 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(mContext);
         int scale = pref.getInt("event_scale", 100);
 
-        RemoteViews rv;
+        RemoteViews rv = null;
 
-        if (position % 2 == 0)
-            rv = createItem(mWidgetItems.get(position / 2).text, 1, position, scale);
-        else
-            rv = createPadding(1, scale);
+        EventInfo event = events.get(position);
+//        EventInfo nextEvent = null;
+//        if (position/2+1 < events.size())
+//            nextEvent = events.get(position/2+1);
+        float hour = (float)(event.end-event.begin)/(1000*60*60);
 
-//        rv.setViewPadding(R.id.widget_item, 0, position * 50, 0, 0);
-//        rv.setInt(R.id.widget_item, "setMinimumHeight", 1000);
-        // You can do heaving lifting in here, synchronously. For example, if you need to
-        // process an image, fetch something from the network, etc., it is ok to do it here,
-        // synchronously. A loading view will show up in lieu of the actual contents in the
-        // interim.
-        try {
-            System.out.println("Loading view " + position);
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        Log.d("RemoteViews", event.title+"  "+hour);
+
+
+        if (event.title.equals("padding")) {
+            rv = createPadding(hour, scale);
         }
-        // Return the remote views object.
+        else
+            rv = createItem(event.title, hour, position, scale);
+
         return rv;
     }
     public RemoteViews getLoadingView() {
@@ -153,7 +156,8 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         Log.d("onDatasetChanged", "onDatasetChanged");
 
 
-        downloader.getAllEvents(model);
+        events = downloader.getAllEvents(model);
+
         // call the downloader with the date range, returns List<EventInfo>
     }
 

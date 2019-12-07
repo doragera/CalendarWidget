@@ -14,7 +14,7 @@ public class CalendarService extends RemoteViewsService {
 //
 //    @Override
 //    public IBinder onBind(Intent intent) {
-//        return mBinder
+//        return mBinder;
 //    }
 //
 //    public class LocalBinder extends Binder {

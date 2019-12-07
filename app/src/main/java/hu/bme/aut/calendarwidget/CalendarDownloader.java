@@ -8,7 +8,10 @@ import android.net.Uri;
 import android.provider.CalendarContract;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
 
 
 public class CalendarDownloader {
@@ -18,13 +21,14 @@ public class CalendarDownloader {
     public static final int MY_CAL_REQ = 1;
 
     private Context context;
+//    private CalendarModel model = new CalendarModel();;
 
 
     public CalendarModel getDataFromCalendarTable() throws SecurityException {
         Cursor cur = null;
         System.out.println("getdata");
-        CalendarModel model = new CalendarModel();
         ContentResolver cr = context.getContentResolver();
+        CalendarModel model = new CalendarModel();
 
         String[] mProjection =
                 {
@@ -69,10 +73,14 @@ public class CalendarDownloader {
         return model;
     }
 
-    public void getAllEvents(CalendarModel model) throws SecurityException {
+    public List<EventInfo> getAllEvents(CalendarModel model) throws SecurityException {
         Cursor cur = null;
         System.out.println("getdata");
         ContentResolver cr = context.getContentResolver();
+
+        ArrayList<EventInfo> events = new ArrayList<EventInfo>();
+
+        List<String> visibleCalendarIDs = model.getVisibleCalendarIDs();
 
         String[] mProjection =
                 {
@@ -92,9 +100,10 @@ public class CalendarDownloader {
         startTime.set(Calendar.HOUR_OF_DAY,0);
         startTime.set(Calendar.MINUTE,0);
         startTime.set(Calendar.SECOND, 0);
-
+        startTime.add(Calendar.DATE, 3);
+        /// TODO vedd ki azt, hogy nem aznapi
         Calendar endTime= Calendar.getInstance();
-        endTime.add(Calendar.DATE, 1);
+        endTime.add(Calendar.DATE, 3);
 
         String selection = "(( " + CalendarContract.Instances.DTSTART + " >= ?" +
                         " ) AND ( " + CalendarContract.Instances.DTSTART + " <= ?" +
@@ -111,6 +120,7 @@ public class CalendarDownloader {
 
         while (cur.moveToNext()) {
             String eventId = cur.getString(cur.getColumnIndex(CalendarContract.Instances._ID));
+            String calendarID = cur.getString(cur.getColumnIndex(CalendarContract.Instances.CALENDAR_ID));
             String title = cur.getString(cur.getColumnIndex(CalendarContract.Instances.TITLE));
             String begin = cur.getString(cur.getColumnIndex(CalendarContract.Instances.BEGIN));
             String end = cur.getString(cur.getColumnIndex(CalendarContract.Instances.END));
@@ -128,9 +138,48 @@ public class CalendarDownloader {
 //                i += Math.pow(2, 31);
 //            System.out.println(String.format("0x%08X", i));
 
+            if (visibleCalendarIDs.contains(calendarID) && Integer.parseInt(allDay)==0) {
+                events.add(new EventInfo(eventId, title, Long.parseLong(begin), Long.parseLong(end), color));
+            }
 
         }
         cur.close();
+        Collections.sort(events);
+
+
+        ArrayList<EventInfo> disp = new ArrayList<EventInfo>();
+        for (int i = 0; i < events.size(); ++i) {
+            if (i != 0) {
+                if (events.get(i-1).end > events.get(i).begin) {
+                    disp.get(disp.size()-1).title = disp.get(disp.size()-1).title.concat("\n" + events.get(i).title);
+                    disp.get(disp.size()-1).end = events.get(i).end;
+                }
+                else {
+                    disp.add(events.get(i));
+                }
+
+            }
+            else {
+                disp.add(events.get(i));
+            }
+        }
+        for (EventInfo ev : disp)
+            Log.d("makebefore", ev.title);
+
+        events.clear();
+        for (int i = 0; i < disp.size(); ++i) {
+            events.add(disp.get(i));
+            if (i < disp.size()-1) {
+//                float padding = (float)(disp.get(i+1).begin-events.get(i).end)/(1000*60*60);
+                events.add(new EventInfo(null, "padding", disp.get(i).end, disp.get(i+1).begin, null));
+            }
+        }
+
+        for (EventInfo ev : events)
+            Log.d("make", ev.title);
+
+
+        return events;
 
     }
 

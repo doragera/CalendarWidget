@@ -25,6 +25,15 @@ class CalendarModel {
         return calendars.get(accName);
     }
 
+    List<String> getVisibleCalendarIDs() {
+        List<String> ids = new ArrayList<String>();
+        for (CalendarInfo cal : calendars.values()) {
+            if (cal.syncEvents && cal.visible)
+                ids.add(cal.id);
+        }
+        return ids;
+    }
+
 //    void remove(String id) {
 //        synchronized (calendars) {
 //            calendars.remove(id);
