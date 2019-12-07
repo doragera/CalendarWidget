@@ -3,26 +3,21 @@ package hu.bme.aut.calendarwidget;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.util.Log;
 
+import androidx.preference.PreferenceManager;
+
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
-
 public class CalendarDownloader {
 
-    public static final String PREF_NAME = "AUTHPREF";
-    public static final String PREF_ACCOUNT_NAME = "accountName";
-    public static final int MY_CAL_REQ = 1;
-
     private Context context;
-//    private CalendarModel model = new CalendarModel();;
-
 
     public CalendarModel getDataFromCalendarTable() throws SecurityException {
         Cursor cur = null;
@@ -80,7 +75,7 @@ public class CalendarDownloader {
 
         ArrayList<EventInfo> events = new ArrayList<EventInfo>();
 
-        List<String> visibleCalendarIDs = model.getVisibleCalendarIDs();
+//        List<String> visibleCalendarIDs = model.getVisibleCalendarIDs();
 
         String[] mProjection =
                 {
@@ -117,17 +112,23 @@ public class CalendarDownloader {
             String color = cur.getString(cur.getColumnIndex(CalendarContract.Instances.DISPLAY_COLOR));
 
 
-            Log.d("getAllEvents", "eventID: " + eventId);
-            Log.d("getAllEvents", "title: " + title);
-            Log.d("getAllEvents", "begin: " + begin);
-            Log.d("getAllEvents", "end: " + end);
-            Log.d("getAllEvents", "allDay: " + allDay);
+//            Log.d("getAllEvents", "eventID: " + eventId);
+//            Log.d("getAllEvents", "title: " + title);
+//            Log.d("getAllEvents", "begin: " + begin);
+//            Log.d("getAllEvents", "end: " + end);
+//            Log.d("getAllEvents", "allDay: " + allDay);
             long i = Integer.parseInt(color);
 //            if (i < 0)
 //                i += Math.pow(2, 31);
 //            System.out.println(String.format("0x%08X", i));
+//            for (String id : visibleCalendarIDs) {
+//                Log.d("visible", id);
+//            }
 
-            if (visibleCalendarIDs.contains(calendarID) && Integer.parseInt(allDay)==0) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            boolean visible = prefs.getBoolean(calendarID, true);
+
+            if (visible && Integer.parseInt(allDay)==0) {
                 events.add(new EventInfo(Integer.parseInt(eventId), title, Long.parseLong(begin), Long.parseLong(end), Integer.parseInt(color)));
             }
 
