@@ -27,13 +27,13 @@ public class SettingsActivity extends AppCompatActivity implements
     private static final String TITLE_TAG = "settingsActivityTitle";
 
 //    static boolean mBounded;
-//    static CalendarService mServer;
+//    static CalendarDayService mServer;
 //
 //    @Override
 //    protected void onStart() {
 //        super.onStart();
 //
-//        Intent mIntent = new Intent(this, CalendarService.class);
+//        Intent mIntent = new Intent(this, CalendarDayService.class);
 //        mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //        bindService(mIntent, mConnection, BIND_AUTO_CREATE);
 //
@@ -57,7 +57,7 @@ public class SettingsActivity extends AppCompatActivity implements
 //        public void onServiceConnected(ComponentName name, IBinder service) {
 ////            Toast.makeText(SettingsActivity.this, "Service is connected", 1000).show();
 //            mBounded = true;
-//            CalendarService.LocalBinder mLocalBinder = (CalendarService.LocalBinder)service;
+//            CalendarDayService.LocalBinder mLocalBinder = (CalendarDayService.LocalBinder)service;
 //            mServer = mLocalBinder.getService();
 //
 //        }

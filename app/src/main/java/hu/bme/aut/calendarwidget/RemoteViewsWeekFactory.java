@@ -4,7 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -13,58 +13,61 @@ import android.widget.RemoteViewsService;
 
 import androidx.preference.PreferenceManager;
 
-import com.google.api.services.calendar.model.Calendar;
-
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-
-class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
+public class RemoteViewsWeekFactory implements RemoteViewsService.RemoteViewsFactory {
     private static int mCount;
 
     private CalendarModel model = null;
-//    private List<WidgetItem> mWidgetItems = new ArrayList<WidgetItem>();
+    //    private List<WidgetItem> mWidgetItems = new ArrayList<WidgetItem>();
     private Context mContext;
     private int mAppWidgetId;
     private List<EventInfo> events;
-    int displayedithPrev = -1;
 
-    private Date startDate;
-    private Date endDate;
+    private long startDate;
+    private long endDate;
+    private Date monday;
+
+    RemoteViews rvWeek;
 
     private CalendarDownloader downloader;
 
-    public RemoteViewsFactory(Context context, Intent intent, CalendarDownloader calendarDownloader) {
+    public RemoteViewsWeekFactory(Context context, Intent intent, CalendarDownloader calendarDownloader) {
         mContext = context;
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         this.downloader = calendarDownloader;
+        Log.d("ctor", "ctor");
+        rvWeek = new RemoteViews(context.getPackageName(), R.layout.widget_layout_week);
     }
     public void onCreate() {
         // In onCreate() you setup any connections / cursors to your data source. Heavy lifting,
         // for example downloading or creating content etc, should be deferred to onDataSetChanged()
         // or getViewAt(). Taking more than 20 seconds in this call will result in an ANR.
 
-        mCount = 4;
-//        for (int i = 0; i < mCount; i++) {
-//            mWidgetItems.add(new WidgetItem(i + "!"));
-//        }
-
 
         downloader.onCreate();
         model = downloader.getDataFromCalendarTable();
-        events = downloader.getAllEvents(model);
-//        onDataSetChanged();
 
-        // We sleep for 3 seconds here to show how the empty view appears in the interim.
-        // The empty view is set in the CalendarWidgetProvider and should be a sibling of the
-        // collection view.
-        /*try {
-            // Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+        Calendar startTime = Calendar.getInstance();
+        startTime.set(Calendar.HOUR_OF_DAY,0);
+        startTime.set(Calendar.MINUTE,0);
+        startTime.set(Calendar.SECOND, 0);
+        startTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        Log.d("onCreate", startTime.toString());
+
+        Calendar endTime= Calendar.getInstance();
+        endTime.add(Calendar.DATE, 7);
+        startDate = startTime.getTimeInMillis();
+        endDate = endTime.getTimeInMillis();
+
+        monday = startTime.getTime();
+
+        events = downloader.getAllEvents(model, startDate, endDate);
+
+
+
     }
     public void onDestroy() {
         // In onDestroy() you should tear down anything that was setup for your data source,
@@ -96,9 +99,9 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         rv.setInt(item, "setBackgroundColor", color);
 
         // Next, we set a fill-intent which will be used to fill-in the pending intent template
-        // which is set on the collection view in CalendarWidgetProvider.
+        // which is set on the collection view in CalendarDayWidgetProvider.
         Bundle extras = new Bundle();
-        extras.putInt(CalendarWidgetProvider.EXTRA_ITEM, eventID);
+        extras.putInt(CalendarWeekWidgetProvider.EXTRA_ITEM, eventID);
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
 
@@ -126,12 +129,26 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
         Log.d("RemoteViews", event.title+"  "+hour);
 
+        Calendar day =  Calendar.getInstance();
+        day.setTimeInMillis(event.begin);
+        Date dday = day.getTime();
+
+
+        int days = (int)((dday.getTime() - monday.getTime())/ 1000 / 60 / 60 / 24);
+        System.out.println(days);
+        int resId = mContext.getResources().getIdentifier("itemsview" + days, "id", mContext.getPackageName());
+        Intent intent = new Intent(mContext, CalendarWeekService.class);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
 
         if (event.title.equals("padding")) {
             rv = createPadding(hour, scale);
         }
         else
             rv = createItem(event.title, hour, position, scale, textSize, event.color, event.eventID);
+
+
+        rvWeek.setRemoteAdapter(resId, intent);
 
         return rv;
     }
@@ -160,27 +177,8 @@ class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         Log.d("onDatasetChanged", "onDatasetChanged");
 
 
-        events = downloader.getAllEvents(model);
+//        events = downloader.getAllEvents(model);
 
-        // call the downloader with the date range, returns List<EventInfo>
     }
 
-    private String createTextForEvent(String text, int heightInUnits) {
-        if (heightInUnits <= 1) {
-            return text;
-        }
-
-        String endingSpace = "";
-        if (heightInUnits % 2 == 0) {
-            endingSpace += "\n";
-            heightInUnits -= 1;
-        }
-
-        String paddingLines = "";
-        for (int i = 1; i <= heightInUnits / 2; ++i) {
-            paddingLines += "\n";
-        }
-
-        return paddingLines + text + paddingLines + endingSpace;
-    }
 }

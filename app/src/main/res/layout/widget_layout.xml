@@ -3,7 +3,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorBackground">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -22,14 +23,14 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:layout_toStartOf="@+id/settings"
-            android:src="@drawable/ic_launcher_background" />
+            android:src="@drawable/ic_refresh" />
 
         <ImageButton
             android:id="@+id/settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_launcher_foreground" />
+            android:src="@drawable/ic_settings" />
     </RelativeLayout>
 
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"

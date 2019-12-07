@@ -1,12 +1,9 @@
 package hu.bme.aut.calendarwidget;
 
 import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-import android.util.Log;
 import android.widget.RemoteViewsService;
 
-public class CalendarService extends RemoteViewsService {
+public class CalendarDayService extends RemoteViewsService {
 
     private CalendarDownloader calendarDownloader;
 
@@ -18,19 +15,20 @@ public class CalendarService extends RemoteViewsService {
 //    }
 //
 //    public class LocalBinder extends Binder {
-//        public CalendarService getService() {
-//            return CalendarService.this;
+//        public CalendarDayService getService() {
+//            return CalendarDayService.this;
 //        }
 //    }
 
     @Override
     public void onCreate() {
         calendarDownloader = new CalendarDownloader(this);
+        super.onCreate();
     }
 
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        return new hu.bme.aut.calendarwidget.RemoteViewsFactory(this.getApplicationContext(), intent, calendarDownloader);
+        return new RemoteViewsDayFactory(this.getApplicationContext(), intent, calendarDownloader);
     }
 }
 

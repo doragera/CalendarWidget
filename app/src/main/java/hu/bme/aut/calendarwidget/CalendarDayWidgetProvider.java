@@ -24,9 +24,8 @@ import android.net.Uri;
 import android.provider.CalendarContract;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
-public class CalendarWidgetProvider extends AppWidgetProvider {
+public class CalendarDayWidgetProvider extends AppWidgetProvider {
     public static final String VIEW_ACTION = "hu.bme.aut.calendarwidget.VIEW_ACTION";
     public static final String EXTRA_ITEM = "hu.bme.aut.calendarwidget.EXTRA_ITEM";
     private static final String SETTINGS_CLICK = "hu.bme.aut.calendarwidget.SETTINGS_CLICK";
@@ -76,7 +75,7 @@ public class CalendarWidgetProvider extends AppWidgetProvider {
             Log.d("onUpdate", ""+i);
             // Here we setup the intent which points to the StackViewService which will
             // provide the views for this collection.
-            Intent intent = new Intent(context, CalendarService.class);
+            Intent intent = new Intent(context, CalendarDayService.class);
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
             // When intents are compared, the extras are ignored, so we need to embed the extras
             // into the data so that the extras will not be ignored.
@@ -93,8 +92,8 @@ public class CalendarWidgetProvider extends AppWidgetProvider {
             // cannot setup their own pending intents, instead, the collection as a whole can
             // setup a pending intent template, and the individual items can set a fillInIntent
             // to create unique before on an item to item basis.
-            Intent viewIntent = new Intent(context, CalendarWidgetProvider.class);
-            viewIntent.setAction(CalendarWidgetProvider.VIEW_ACTION);
+            Intent viewIntent = new Intent(context, CalendarDayWidgetProvider.class);
+            viewIntent.setAction(CalendarDayWidgetProvider.VIEW_ACTION);
             viewIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
             PendingIntent viewPendingIntent = PendingIntent.getBroadcast(context, 0, viewIntent,

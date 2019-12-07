@@ -73,7 +73,7 @@ public class CalendarDownloader {
         return model;
     }
 
-    public List<EventInfo> getAllEvents(CalendarModel model) throws SecurityException {
+    public List<EventInfo> getAllEvents(CalendarModel model, long fromDay, long toDay) throws SecurityException {
         Cursor cur = null;
         System.out.println("getdata");
         ContentResolver cr = context.getContentResolver();
@@ -94,26 +94,15 @@ public class CalendarDownloader {
 
                 };
 
-
-        Calendar startTime = Calendar.getInstance();
-
-        startTime.set(Calendar.HOUR_OF_DAY,0);
-        startTime.set(Calendar.MINUTE,0);
-        startTime.set(Calendar.SECOND, 0);
-        startTime.add(Calendar.DATE, 3);
-        /// TODO vedd ki azt, hogy nem aznapi
-        Calendar endTime= Calendar.getInstance();
-        endTime.add(Calendar.DATE, 3);
-
         String selection = "(( " + CalendarContract.Instances.DTSTART + " >= ?" +
                         " ) AND ( " + CalendarContract.Instances.DTSTART + " <= ?" +
                         " ) AND ( deleted != 1 ))"; ;
-        String[] selectionArgs = new String[] { Long.toString(startTime.getTimeInMillis()), Long.toString(endTime.getTimeInMillis()) };
+        String[] selectionArgs = new String[] { Long.toString(fromDay), Long.toString(toDay) };
 
         Uri.Builder eventsUriBuilder = CalendarContract.Instances.CONTENT_URI
                 .buildUpon();
-        ContentUris.appendId(eventsUriBuilder, startTime.getTimeInMillis());
-        ContentUris.appendId(eventsUriBuilder, endTime.getTimeInMillis());
+        ContentUris.appendId(eventsUriBuilder, fromDay);
+        ContentUris.appendId(eventsUriBuilder, toDay);
 
         Uri uri = eventsUriBuilder.build();
         cur = cr.query(uri, mProjection, selection, selectionArgs, null);

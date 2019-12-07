@@ -21,18 +21,35 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".CalendarWidgetProvider">
+        <receiver android:name=".CalendarDayWidgetProvider"
+            android:label="Day view">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/example_appwidget_info" />
+                android:resource="@xml/appwidget_info_day" />
+        </receiver>
+
+        <receiver android:name=".CalendarWeekWidgetProvider"
+            android:label="Week view">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/appwidget_info_week" />
         </receiver>
 
         <service
-            android:name=".CalendarService"
+            android:name=".CalendarDayService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <service
+            android:name=".CalendarWeekService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
