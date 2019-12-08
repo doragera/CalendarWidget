@@ -14,8 +14,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Today"
+            android:text="@string/week"
             android:textSize="36sp" />
+
+        <ImageButton
+            android:id="@+id/addEvent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@+id/refresh"
+            android:src="@drawable/ic_add_events" />
 
         <ImageButton
             android:id="@+id/refresh"

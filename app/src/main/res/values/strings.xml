@@ -25,4 +25,6 @@
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
     <string name="calendars_permission_explanation">The application needs to access your calendars to display them.</string>
+    <string name="week">Week</string>
+    <string name="today">Today</string>
 </resources>

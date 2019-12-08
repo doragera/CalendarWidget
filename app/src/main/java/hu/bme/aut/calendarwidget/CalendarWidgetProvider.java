@@ -29,6 +29,7 @@ public abstract class CalendarWidgetProvider extends AppWidgetProvider {
     public static final String EXTRA_ITEM = "hu.bme.aut.calendarwidget.EXTRA_ITEM";
     private static final String SETTINGS_CLICK = "hu.bme.aut.calendarwidget.SETTINGS_CLICK";
     private static final String REFRESH_CLICK = "hu.bme.aut.calendarwidget.REFRESH_CLICK";
+    private static final String ADD_EVENT_CLICK = "hu.bme.aut.calendarwidget.ADD_EVENT_CLICK";
 
     protected abstract int dayFrom();
     protected abstract int dayTo();
@@ -55,7 +56,6 @@ public abstract class CalendarWidgetProvider extends AppWidgetProvider {
             Intent viewIntent = new Intent(Intent.ACTION_VIEW).setData(uri);
             viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(viewIntent);
-//            Toast.makeText(context, "Touched view " + viewIndex, Toast.LENGTH_SHORT).show();
         }
         if (intent.getAction().equals(SETTINGS_CLICK)) {
             Intent startintent = new Intent(context, SettingsActivity.class);
@@ -63,9 +63,13 @@ public abstract class CalendarWidgetProvider extends AppWidgetProvider {
             context.startActivity(startintent);
         }
         if (intent.getAction().equals(REFRESH_CLICK)) {
-            System.out.println("refreshweek");
             int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetId, layoutId());
+        }
+        if (intent.getAction().equals(ADD_EVENT_CLICK)) {
+            Intent addIntent = new Intent(Intent.ACTION_INSERT)
+                    .setData(CalendarContract.Events.CONTENT_URI).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(addIntent);
         }
         super.onReceive(context, intent);
     }
@@ -79,6 +83,7 @@ public abstract class CalendarWidgetProvider extends AppWidgetProvider {
             RemoteViews rv = new RemoteViews(context.getPackageName(), layoutId());
             rv.setOnClickPendingIntent(R.id.settings, PendingIntent.getBroadcast(context, 0, new Intent(context, getClass()).setAction(SETTINGS_CLICK), 0));
             rv.setOnClickPendingIntent(R.id.refresh, PendingIntent.getBroadcast(context, 0, new Intent(context, getClass()).setAction(REFRESH_CLICK).putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]), 0));
+            rv.setOnClickPendingIntent(R.id.addEvent, PendingIntent.getBroadcast(context, 0, new Intent(context, getClass()).setAction(ADD_EVENT_CLICK), 0));
 
             for (int day = dayFrom(); day <= dayTo(); ++day) {
                 int resId = context.getResources().getIdentifier("itemsview" + day, "id", context.getPackageName());
