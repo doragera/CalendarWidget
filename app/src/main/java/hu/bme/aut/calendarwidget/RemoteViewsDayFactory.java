@@ -65,6 +65,8 @@ public class RemoteViewsDayFactory implements RemoteViewsService.RemoteViewsFact
         endTime.set(Calendar.MINUTE,0);
         endTime.set(Calendar.SECOND, 0);
 
+        long earliestEventBegin = 0;
+
         if (dayOfWeek == 0) {
             // TODO: remove this
             startTime.add(Calendar.DATE, 3);
@@ -74,16 +76,26 @@ public class RemoteViewsDayFactory implements RemoteViewsService.RemoteViewsFact
             endTime.add(Calendar.DATE, 1);
         } else {
             startTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-            startTime.add(Calendar.DATE, dayOfWeek - 1);
+            startTime.add(Calendar.DATE, dayOfWeek - 8);
 
             endTime.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-            endTime.add(Calendar.DATE, dayOfWeek);
+            endTime.add(Calendar.DATE, dayOfWeek - 7);
+
+            Calendar firstDayinWeek = Calendar.getInstance();
+            firstDayinWeek.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+            firstDayinWeek.add(Calendar.DATE, -8);
+
+            Calendar lastDayinWeek = Calendar.getInstance();
+            lastDayinWeek.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+            lastDayinWeek.add(Calendar.DATE, -1);
+
+            earliestEventBegin = downloader.getEarliestTimeinWeek(firstDayinWeek.getTimeInMillis(), lastDayinWeek.getTimeInMillis());
         }
 
 
         startDate = startTime.getTimeInMillis();
         endDate = endTime.getTimeInMillis();
-        events = downloader.getAllEvents(model, startDate, endDate);
+        events = downloader.getAllEvents(model, startDate, endDate, earliestEventBegin);
     }
     public void onDestroy() {
         events.clear();

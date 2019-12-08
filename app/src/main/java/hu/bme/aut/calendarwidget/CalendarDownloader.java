@@ -13,7 +13,10 @@ import androidx.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+
+import static java.lang.Math.abs;
 
 public class CalendarDownloader {
 
@@ -68,7 +71,44 @@ public class CalendarDownloader {
         return model;
     }
 
-    public List<EventInfo> getAllEvents(CalendarModel model, long fromDay, long toDay) throws SecurityException {
+    public long getEarliestTimeinWeek(long weekFirst, long weekLast) throws SecurityException {
+        Cursor cur = null;
+        ContentResolver cr = context.getContentResolver();
+
+        String[] mProjection =
+                {
+                        CalendarContract.Instances.BEGIN,
+                        CalendarContract.Instances.ALL_DAY,
+                };
+
+        String selection = "(( " + CalendarContract.Instances.DTSTART + " >= ?" +
+                " ) AND ( " + CalendarContract.Instances.DTSTART + " <= ?" +
+                " ) AND ( deleted != 1 ))"; ;
+        String[] selectionArgs = new String[] { Long.toString(weekFirst), Long.toString(weekLast) };
+
+        Uri.Builder eventsUriBuilder = CalendarContract.Instances.CONTENT_URI
+                .buildUpon();
+        ContentUris.appendId(eventsUriBuilder, weekFirst);
+        ContentUris.appendId(eventsUriBuilder, weekLast);
+
+        Uri uri = eventsUriBuilder.build();
+        cur = cr.query(uri, mProjection, selection, selectionArgs, null);
+
+        long min = Long.MAX_VALUE;
+
+        while (cur.moveToNext()) {
+            String begin = cur.getString(cur.getColumnIndex(CalendarContract.Instances.BEGIN));
+            String allDay = cur.getString(cur.getColumnIndex(CalendarContract.Instances.ALL_DAY));
+
+            if (Long.parseLong(begin) < min && Integer.parseInt(allDay)==0)
+                min = Long.parseLong(begin);
+
+        }
+        cur.close();
+        return min;
+    }
+
+    public List<EventInfo> getAllEvents(CalendarModel model, long fromDay, long toDay, long earliestEventBegin) throws SecurityException {
         Cursor cur = null;
 //        System.out.println("getdata");
         ContentResolver cr = context.getContentResolver();
@@ -153,14 +193,22 @@ public class CalendarDownloader {
                 disp.add(events.get(i));
             }
         }
-//        for (EventInfo ev : disp)
-//            Log.d("makebefore", ev.title);
+
 
         events.clear();
         for (int i = 0; i < disp.size(); ++i) {
+            if (i == 0) {
+                Date today = new Date(disp.get(i).begin);
+                Date earliestToday = new Date(earliestEventBegin);
+                earliestToday.setDate(today.getDate());
+                if (earliestToday.before(today)) {
+                    Log.d("padding", ""+earliestToday);
+                    Log.d("padding", ""+today);
+                    events.add(new EventInfo(0, "padding", earliestToday.getTime(), disp.get(i).begin, 0));
+                }
+            }
             events.add(disp.get(i));
             if (i < disp.size()-1) {
-//                float padding = (float)(disp.get(i+1).begin-events.get(i).end)/(1000*60*60);
                 events.add(new EventInfo(0, "padding", disp.get(i).end, disp.get(i+1).begin, 0));
             }
         }
