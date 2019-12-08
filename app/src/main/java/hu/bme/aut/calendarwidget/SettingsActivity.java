@@ -5,7 +5,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -20,59 +19,11 @@ import androidx.preference.PreferenceScreen;
 import java.util.List;
 import java.util.Set;
 
-import static androidx.appcompat.app.AlertDialog.*;
-
 public class SettingsActivity extends AppCompatActivity implements
         PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
     private static final String TITLE_TAG = "settingsActivityTitle";
     private static final int MY_PERMISSIONS_REQUEST_READ_CALENDAR = 100;
-
-//    static boolean mBounded;
-//    static CalendarDayService mServer;
-//
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//
-//        Intent mIntent = new Intent(this, CalendarDayService.class);
-//        mIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        bindService(mIntent, mConnection, BIND_AUTO_CREATE);
-//
-//    };
-//
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        System.out.println(mBounded);
-//    }
-//
-//    ServiceConnection mConnection = new ServiceConnection() {
-//        @Override
-//        public void onServiceDisconnected(ComponentName name) {
-////            Toast.makeText(SettingsActivity.this, "Service is disconnected", 1000).show();
-//            mBounded = false;
-//            mServer = null;
-//        }
-//
-//        @Override
-//        public void onServiceConnected(ComponentName name, IBinder service) {
-////            Toast.makeText(SettingsActivity.this, "Service is connected", 1000).show();
-//            mBounded = true;
-//            CalendarDayService.LocalBinder mLocalBinder = (CalendarDayService.LocalBinder)service;
-//            mServer = mLocalBinder.getService();
-//
-//        }
-//    };
-//
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        if(mBounded) {
-//            unbindService(mConnection);
-//            mBounded = false;
-//        }
-//    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,34 +64,6 @@ public class SettingsActivity extends AppCompatActivity implements
             // Permission has already been granted
         }
     }
-
-//    private void showRationaleDialog() {
-//        String title = getResources().getString(R.string.rationale_dialog_title);
-//        String explanation = getResources().getString(R.string.calendars_permission_explanation);
-//         AlertDialog alertDialog = new AlertDialog.Builder(this)
-//                .setTitle(title)
-//                .setMessage(explanation)
-//                 .setPositiveButton("OK", null)
-//                 .setNegativeButton("Cancel", null)
-//                 .create()
-//                 .show();
-//    }
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-//        switch (requestCode) {
-//            case MY_PERMISSIONS_REQUEST_READ_CALENDAR: {
-//                // If request is cancelled, the result arrays are empty.
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//
-//                } else {
-//                }
-//                return;
-//            }
-//        }
-//    }
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {

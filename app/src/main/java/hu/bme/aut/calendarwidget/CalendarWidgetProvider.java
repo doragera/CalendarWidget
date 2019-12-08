@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package hu.bme.aut.calendarwidget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -64,7 +49,10 @@ public abstract class CalendarWidgetProvider extends AppWidgetProvider {
         }
         if (intent.getAction().equals(REFRESH_CLICK)) {
             int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-            AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetId, layoutId());
+            for (int day = dayFrom(); day <= dayTo(); ++day) {
+                int resId = context.getResources().getIdentifier("itemsview" + day, "id", context.getPackageName());
+                AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetId, resId);
+            }
         }
         if (intent.getAction().equals(ADD_EVENT_CLICK)) {
             Intent addIntent = new Intent(Intent.ACTION_INSERT)
@@ -75,10 +63,7 @@ public abstract class CalendarWidgetProvider extends AppWidgetProvider {
     }
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // update each of the widgets with the remote adapter
         for (int i = 0; i < appWidgetIds.length; ++i) {
-            // Here we setup the intent which points to the StackViewService which will
-            // provide the views for this collection.
 
             RemoteViews rv = new RemoteViews(context.getPackageName(), layoutId());
             rv.setOnClickPendingIntent(R.id.settings, PendingIntent.getBroadcast(context, 0, new Intent(context, getClass()).setAction(SETTINGS_CLICK), 0));
@@ -92,22 +77,13 @@ public abstract class CalendarWidgetProvider extends AppWidgetProvider {
                 intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
                 intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
                 intent.putExtra(CalendarWidgetService.DAY_OF_WEEK, day);
-                // When intents are compared, the extras are ignored, so we need to embed the extras
-                // into the data so that the extras will not be ignored.
                 intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
 
                 rv.setRemoteAdapter(resId, intent);
-                // The empty view is displayed when the collection has no items. It should be a sibling
-                // of the collection view.
-//                rv.setEmptyView(resId, R.id.empty_view_week);
-                // Here we setup the a pending intent template. Individuals items of a collection
-                // cannot setup their own pending intents, instead, the collection as a whole can
-                // setup a pending intent template, and the individual items can set a fillInIntent
-                // to create unique before on an item to item basis.
+
                 Intent viewIntent = new Intent(context, getClass());
                 viewIntent.setAction(CalendarWidgetProvider.VIEW_ACTION);
                 viewIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
-                // viewIntent.setData(Uri.parse(viewIntent.toUri(Intent.URI_INTENT_SCHEME)));
                 PendingIntent viewPendingIntent = PendingIntent.getBroadcast(context, 0, viewIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT);
                 rv.setPendingIntentTemplate(resId, viewPendingIntent);

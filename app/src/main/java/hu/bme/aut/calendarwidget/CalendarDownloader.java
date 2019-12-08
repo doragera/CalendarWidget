@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract;
-import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
@@ -16,15 +15,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import static java.lang.Math.abs;
-
 public class CalendarDownloader {
 
     private Context context;
 
     public CalendarModel getDataFromCalendarTable() throws SecurityException {
         Cursor cur = null;
-//        System.out.println("getdata");
+
         ContentResolver cr = context.getContentResolver();
         CalendarModel model = new CalendarModel();
 
@@ -52,17 +49,6 @@ public class CalendarDownloader {
             String syncEvents = cur.getString(cur.getColumnIndex(CalendarContract.Calendars.SYNC_EVENTS));
             String color = cur.getString(cur.getColumnIndex(CalendarContract.Calendars.CALENDAR_COLOR));
             String id = cur.getString(cur.getColumnIndex(CalendarContract.Calendars._ID));
-
-
-//            System.out.println(displayName);
-//            System.out.println(accountName);
-//            System.out.println(visible);
-//            System.out.println(color);
-//            System.out.println(syncEvents);
-            long i = Integer.parseInt(color);
-            if (i < 0)
-                i += Math.pow(2, 31);
-//            System.out.println(String.format("0x%08X", i));
 
             model.add(accountName, new CalendarInfo(id, displayName, Integer.parseInt(visible)!=0, Integer.parseInt(syncEvents)!=0));
 
@@ -110,12 +96,9 @@ public class CalendarDownloader {
 
     public List<EventInfo> getAllEvents(CalendarModel model, long fromDay, long toDay, long earliestEventBegin) throws SecurityException {
         Cursor cur = null;
-//        System.out.println("getdata");
         ContentResolver cr = context.getContentResolver();
 
         ArrayList<EventInfo> events = new ArrayList<EventInfo>();
-
-//        List<String> visibleCalendarIDs = model.getVisibleCalendarIDs();
 
         String[] mProjection =
                 {
@@ -150,20 +133,6 @@ public class CalendarDownloader {
             String end = cur.getString(cur.getColumnIndex(CalendarContract.Instances.END));
             String allDay = cur.getString(cur.getColumnIndex(CalendarContract.Instances.ALL_DAY));
             String color = cur.getString(cur.getColumnIndex(CalendarContract.Instances.DISPLAY_COLOR));
-
-
-//            Log.d("getAllEvents", "eventID: " + eventId);
-//            Log.d("getAllEvents", "title: " + title);
-//            Log.d("getAllEvents", "begin: " + begin);
-//            Log.d("getAllEvents", "end: " + end);
-//            Log.d("getAllEvents", "allDay: " + allDay);
-            long i = Integer.parseInt(color);
-//            if (i < 0)
-//                i += Math.pow(2, 31);
-//            System.out.println(String.format("0x%08X", i));
-//            for (String id : visibleCalendarIDs) {
-//                Log.d("visible", id);
-//            }
 
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             boolean visible = prefs.getBoolean(calendarID, true);
@@ -202,8 +171,6 @@ public class CalendarDownloader {
                 Date earliestToday = new Date(earliestEventBegin);
                 earliestToday.setDate(today.getDate());
                 if (earliestToday.before(today)) {
-                    Log.d("padding", ""+earliestToday);
-                    Log.d("padding", ""+today);
                     events.add(new EventInfo(0, "padding", earliestToday.getTime(), disp.get(i).begin, 0));
                 }
             }
@@ -213,10 +180,6 @@ public class CalendarDownloader {
             }
         }
 
-//        for (EventInfo ev : events)
-//            Log.d("make", ev.title);
-
-
         return events;
 
     }
@@ -224,14 +187,6 @@ public class CalendarDownloader {
 
     public CalendarDownloader(Context context) {
         this.context = context;
-    }
-
-    public void onCreate() {
-
-    }
-
-    public void onUpdate() {
-
     }
 
 }

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">CalendarWidget</string>
     <string name="empty_view_text">Empty text</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_settings">CalendarWidget</string>
 
     <!-- Preference Titles -->
     <string name="messages_header">Messages</string>

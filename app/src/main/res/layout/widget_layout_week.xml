@@ -47,17 +47,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="7">
-        <!--TextView
-            android:id="@+id/empty_view_week"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:background="@drawable/widget_item_background"
-            android:textColor="#ffffff"
-            android:textStyle="bold"
-            android:text="@string/empty_view_text"
-            android:textSize="20sp" /-->
+
         <ListView
             android:id="@+id/itemsview1"
             android:layout_width="wrap_content"
