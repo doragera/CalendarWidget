@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".CalendarDayWidgetProvider"
+        <receiver android:name=".CalendarWidgetDayProvider"
             android:label="Day view">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -32,7 +32,7 @@
                 android:resource="@xml/appwidget_info_day" />
         </receiver>
 
-        <receiver android:name=".CalendarWeekWidgetProvider"
+        <receiver android:name=".CalendarWidgetWeekProvider"
             android:label="Week view">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -44,12 +44,7 @@
         </receiver>
 
         <service
-            android:name=".CalendarDayService"
-            android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS" />
-
-        <service
-            android:name=".CalendarWeekService"
+            android:name=".CalendarWidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>

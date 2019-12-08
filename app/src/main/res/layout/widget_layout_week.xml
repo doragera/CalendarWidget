@@ -35,61 +35,63 @@
 
     <LinearLayout
         android:id="@+id/itemsviewWeek"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="7">
-        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        <!--TextView
+            android:id="@+id/empty_view_week"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:background="@drawable/widget_item_background"
+            android:textColor="#ffffff"
+            android:textStyle="bold"
+            android:text="@string/empty_view_text"
+            android:textSize="20sp" /-->
+        <ListView
             android:id="@+id/itemsview1"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="bottom"
             android:layout_weight="1"/>
-        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        <ListView
             android:id="@+id/itemsview2"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="bottom"
             android:layout_weight="1"/>
-        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        <ListView
             android:id="@+id/itemsview3"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="bottom"
             android:layout_weight="1"/>
-        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        <ListView
             android:id="@+id/itemsview4"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="bottom"
             android:layout_weight="1"/>
-        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        <ListView
             android:id="@+id/itemsview5"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="bottom"
             android:layout_weight="1"/>
-        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        <ListView
             android:id="@+id/itemsview6"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="bottom"
             android:layout_weight="1"/>
-        <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        <ListView
             android:id="@+id/itemsview7"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="bottom"
             android:layout_weight="1"/>
     </LinearLayout>
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/empty_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:background="@drawable/widget_item_background"
-        android:textColor="#ffffff"
-        android:textStyle="bold"
-        android:text="@string/empty_view_text"
-        android:textSize="20sp" />
+
 </LinearLayout>

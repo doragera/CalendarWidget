@@ -21,7 +21,7 @@ public class CalendarDownloader {
 
     public CalendarModel getDataFromCalendarTable() throws SecurityException {
         Cursor cur = null;
-        System.out.println("getdata");
+//        System.out.println("getdata");
         ContentResolver cr = context.getContentResolver();
         CalendarModel model = new CalendarModel();
 
@@ -51,15 +51,15 @@ public class CalendarDownloader {
             String id = cur.getString(cur.getColumnIndex(CalendarContract.Calendars._ID));
 
 
-            System.out.println(displayName);
-            System.out.println(accountName);
-            System.out.println(visible);
-            System.out.println(color);
-            System.out.println(syncEvents);
+//            System.out.println(displayName);
+//            System.out.println(accountName);
+//            System.out.println(visible);
+//            System.out.println(color);
+//            System.out.println(syncEvents);
             long i = Integer.parseInt(color);
             if (i < 0)
                 i += Math.pow(2, 31);
-            System.out.println(String.format("0x%08X", i));
+//            System.out.println(String.format("0x%08X", i));
 
             model.add(accountName, new CalendarInfo(id, displayName, Integer.parseInt(visible)!=0, Integer.parseInt(syncEvents)!=0));
 
@@ -70,7 +70,7 @@ public class CalendarDownloader {
 
     public List<EventInfo> getAllEvents(CalendarModel model, long fromDay, long toDay) throws SecurityException {
         Cursor cur = null;
-        System.out.println("getdata");
+//        System.out.println("getdata");
         ContentResolver cr = context.getContentResolver();
 
         ArrayList<EventInfo> events = new ArrayList<EventInfo>();
@@ -79,7 +79,7 @@ public class CalendarDownloader {
 
         String[] mProjection =
                 {
-                        CalendarContract.Instances._ID,
+                        CalendarContract.Instances.EVENT_ID,
                         CalendarContract.Instances.TITLE,
                         CalendarContract.Instances.BEGIN,
                         CalendarContract.Instances.END,
@@ -103,7 +103,7 @@ public class CalendarDownloader {
         cur = cr.query(uri, mProjection, selection, selectionArgs, null);
 
         while (cur.moveToNext()) {
-            String eventId = cur.getString(cur.getColumnIndex(CalendarContract.Instances._ID));
+            String eventId = cur.getString(cur.getColumnIndex(CalendarContract.Instances.EVENT_ID));
             String calendarID = cur.getString(cur.getColumnIndex(CalendarContract.Instances.CALENDAR_ID));
             String title = cur.getString(cur.getColumnIndex(CalendarContract.Instances.TITLE));
             String begin = cur.getString(cur.getColumnIndex(CalendarContract.Instances.BEGIN));
@@ -153,8 +153,8 @@ public class CalendarDownloader {
                 disp.add(events.get(i));
             }
         }
-        for (EventInfo ev : disp)
-            Log.d("makebefore", ev.title);
+//        for (EventInfo ev : disp)
+//            Log.d("makebefore", ev.title);
 
         events.clear();
         for (int i = 0; i < disp.size(); ++i) {
@@ -165,8 +165,8 @@ public class CalendarDownloader {
             }
         }
 
-        for (EventInfo ev : events)
-            Log.d("make", ev.title);
+//        for (EventInfo ev : events)
+//            Log.d("make", ev.title);
 
 
         return events;
